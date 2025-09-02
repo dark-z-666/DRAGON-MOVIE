@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dragon Cinema - Premium Movie Streaming</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --text-muted: #666666;
+            --accent: #ffffff;
+            --border: #333333;
+            --shadow: rgba(0, 0, 0, 0.5);
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #e9ecef;
+            --text-primary: #000000;
+            --text-secondary: #495057;
+            --text-muted: #6c757d;
+            --accent: #000000;
+            --border: #dee2e6;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --glass: rgba(0, 0, 0, 0.02);
+            --glass-border: rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+            font-optical-sizing: auto;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Smooth scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: var(--glass);
+            backdrop-filter: blur(30px) saturate(200%);
+            border-bottom: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0.3;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .logo:hover {
+            transform: translateY(-1px);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary-gradient);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 10px rgba(255, 107, 107, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: logoShine 3s ease-in-out infinite;
+        }
+
+        @keyframes logoShine {
+            0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .theme-toggle {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1.1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-toggle::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transition: left 0.4s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-tertiary);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .theme-toggle:hover::before {
+            left: 100%;
+        }
+
+        .theme-toggle:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 70px;
+            min-height: calc(100vh - 70px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 4rem 2rem 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.04em;
+            line-height: 1.1;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        .hero-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            border-radius: 2px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.375rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            font-weight: 400;
+            line-height: 1.6;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Search Section */
+        .search-section {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .search-container {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px var(--shadow);
+        }
+
+        .search-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 300px;
+            padding: 1rem 1.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--glass);
+            transform: translateY(-1px);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-btn {
+            padding: 1rem 2rem;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .search-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 35px rgba(255, 107, 107, 0.4);
+            background: linear-gradient(135deg, #ff5252 0%, #d84315 100%);
+        }
+
+        .search-btn:hover::before {
+            left: 100%;
+        }
+
+        .search-btn:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .search-hints {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .hint-label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .hint-tag {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .hint-tag:hover {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+
+        /* Player Section */
+        .player-section {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        .player-container {
+            background: var(--glass);
+            backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 25px 80px var(--shadow);
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .player-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 35px 100px var(--shadow);
+        }
+
+        .player-container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, 
+                rgba(255, 107, 107, 0.3) 0%, 
+                rgba(238, 90, 36, 0.3) 25%, 
+                rgba(255, 107, 107, 0.3) 50%, 
+                rgba(238, 90, 36, 0.3) 75%, 
+                rgba(255, 107, 107, 0.3) 100%);
+            border-radius: 18px;
+            z-index: -1;
+            opacity: 0.8;
+            animation: subtlePulse 4s ease-in-out infinite;
+        }
+
+        @keyframes subtlePulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.01); }
+        }
+
+        .player-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .player-title-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .player-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .player-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .player-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .server-controls {
+            display: flex;
+            gap: 0.25rem;
+            margin-right: 1rem;
+        }
+
+        .server-btn {
+            padding: 0.5rem 0.75rem;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: none;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .server-btn:hover {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+
+        .server-btn.active {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .control-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: none;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+
+        .player-content {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            background: var(--bg-secondary);
+        }
+
+        .player-iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .player-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+        }
+
+        .placeholder-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--glass);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            animation: gentlePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes gentlePulse {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.02); opacity: 1; }
+        }
+
+        .placeholder-text {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 400px;
+            line-height: 1.5;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--glass-border);
+            padding: 2.5rem 2rem 1.5rem;
+            margin-top: auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0.5;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
+
+        .footer-logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--text-secondary) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .footer-section h3 {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+
+        .footer-section p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .footer-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0.25rem 0;
+        }
+
+        .footer-link:hover {
+            color: var(--text-primary);
+            transform: translateX(4px);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-link {
+            width: 44px;
+            height: 44px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: var(--text-secondary);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .social-link:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .social-link:hover::before {
+            left: 100%;
+        }
+
+        .footer-bottom {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .footer-bottom-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-bottom-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-bottom-link:hover {
+            color: var(--text-secondary);
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--glass-border);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 1rem;
+            }
+
+            .nav-menu {
+                display: none;
+            }
+
+            .hero {
+                padding: 3rem 1rem 1rem;
+            }
+
+            .hero-title::after {
+                width: 60px;
+            }
+
+            .search-section,
+            .player-section {
+                padding: 1rem;
+            }
+
+            .search-container {
+                padding: 1.5rem;
+            }
+
+            .search-form {
+                flex-direction: column;
+            }
+
+            .search-input {
+                min-width: unset;
+            }
+
+            .player-header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .footer {
+                padding: 3rem 1rem 2rem;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .footer-bottom-links {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .search-container {
+                padding: 1rem;
+            }
+
+            .player-content {
+                padding-bottom: 75%; /* More square on mobile */
+            }
+        }
+
+        /* Performance optimizations */
+        .player-iframe {
+            will-change: transform;
+        }
+
+        .theme-toggle,
+        .search-btn,
+        .control-btn {
+            will-change: transform;
+        }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Focus styles */
+        .theme-toggle:focus,
+        .search-btn:focus,
+        .control-btn:focus {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="#" class="logo">
+                <div class="logo-icon">🎬</div>
+                <span>Dragon Cinema</span>
+            </a>
+            <div class="nav-controls">
+                <nav class="nav-menu">
+                    <a href="#" class="nav-link">Home</a>
+                    <a href="#" class="nav-link">Movies</a>
+                    <a href="#" class="nav-link">Premium</a>
+                    <a href="#" class="nav-link">About</a>
+                </nav>
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                    🌙
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">Premium Movie Experience</h1>
+                <p class="hero-subtitle">Stream unlimited movies in stunning quality. Enter any IMDb ID to start watching instantly.</p>
+            </div>
+        </section>
+
+        <!-- Search Section -->
+        <section class="search-section">
+            <div class="search-container">
+                <form class="search-form" id="movie-form">
+                    <input 
+                        type="text" 
+                        class="search-input" 
+                        id="imdb-input" 
+                        placeholder="Enter IMDb Movie ID (e.g., tt1375666 for Inception)"
+                        autocomplete="off"
+                    >
+                    <button type="submit" class="search-btn" id="watch-btn">
+                        <span class="btn-text">Watch Now</span>
+                        <span class="btn-loading" style="display: none;">
+                            <span class="loading"></span>
+                        </span>
+                    </button>
+                </form>
+                <div class="search-hints">
+                    <span class="hint-label">Popular:</span>
+                    <span class="hint-tag" data-id="tt1375666">Inception</span>
+                    <span class="hint-tag" data-id="tt0111161">Shawshank</span>
+                    <span class="hint-tag" data-id="tt0468569">Dark Knight</span>
+                    <span class="hint-tag" data-id="tt0137523">Fight Club</span>
+                    <span class="hint-tag" data-id="tt0109830">Forrest Gump</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Player Section -->
+        <section class="player-section">
+            <div class="player-container">
+                <div class="player-header">
+                    <div class="player-title-section">
+                        <h2 class="player-title" id="player-title">Movie Player</h2>
+                        <p class="player-subtitle" id="player-subtitle">Ready to stream</p>
+                    </div>
+                    <div class="player-controls">
+                        <div class="server-controls" id="server-controls" style="display: none;">
+                            <button class="server-btn active" data-server="0">Server 1</button>
+                            <button class="server-btn" data-server="1">Server 2</button>
+                            <button class="server-btn" data-server="2">Server 3</button>
+                        </div>
+                        <button class="control-btn" id="fullscreen-btn" title="Fullscreen">⛶</button>
+                        <button class="control-btn" id="refresh-btn" title="Refresh">↻</button>
+                    </div>
+                </div>
+                <div class="player-content" id="player-content">
+                    <div class="player-placeholder" id="player-placeholder">
+                        <div class="placeholder-icon">🎭</div>
+                        <p class="placeholder-text">
+                            Ready to stream your favorite movies?<br>
+                            Enter an IMDb ID above to get started.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <a href="#" class="footer-logo">
+                    <div class="footer-logo-icon">🎬</div>
+                    <span>Dragon Cinema</span>
+                </a>
+                <p>The ultimate destination for premium movie streaming. Experience cinema like never before with our cutting-edge platform designed for true movie enthusiasts.</p>
+                <div class="social-links">
+                    <a href="https://facebook.com" class="social-link" target="_blank" rel="noopener" aria-label="Facebook">
+                        📘
+                    </a>
+                    <a href="https://telegram.org" class="social-link" target="_blank" rel="noopener" aria-label="Telegram">
+                        ✈️
+                    </a>
+                    <a href="https://twitter.com" class="social-link" target="_blank" rel="noopener" aria-label="Twitter">
+                        🐦
+                    </a>
+                    <a href="https://instagram.com" class="social-link" target="_blank" rel="noopener" aria-label="Instagram">
+                        📷
+                    </a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Platform</h3>
+                <div class="footer-links">
+                    <a href="#" class="footer-link">Browse Movies</a>
+                    <a href="#" class="footer-link">Premium Features</a>
+                    <a href="#" class="footer-link">Mobile Apps</a>
+                    <a href="#" class="footer-link">API Access</a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Support</h3>
+                <div class="footer-links">
+                    <a href="#" class="footer-link">Help Center</a>
+                    <a href="#" class="footer-link">Contact Us</a>
+                    <a href="#" class="footer-link">Bug Reports</a>
+                    <a href="#" class="footer-link">Feature Requests</a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Company</h3>
+                <div class="footer-links">
+                    <a href="#" class="footer-link">About Us</a>
+                    <a href="#" class="footer-link">Careers</a>
+                    <a href="#" class="footer-link">Press Kit</a>
+                    <a href="#" class="footer-link">Partnerships</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Dragon Cinema. All rights reserved.</p>
+            <div class="footer-bottom-links">
+                <a href="#" class="footer-bottom-link">Privacy Policy</a>
+                <a href="#" class="footer-bottom-link">Terms of Service</a>
+                <a href="#" class="footer-bottom-link">Cookie Policy</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        $(document).ready(function() {
+            // Global variables
+            let currentImdbId = '';
+            let currentServer = 0;
+            
+            // Theme Management
+            const themeToggle = $('#theme-toggle');
+            const body = $('body');
+            
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            if (savedTheme === 'light') {
+                body.attr('data-theme', 'light');
+                themeToggle.text('☀️');
+            }
+
+            // Theme toggle functionality with smooth transition
+            themeToggle.on('click', function() {
+                const currentTheme = body.attr('data-theme');
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                
+                // Add transition class for smooth animation
+                body.addClass('theme-transitioning');
+                
+                setTimeout(() => {
+                    body.attr('data-theme', newTheme === 'light' ? 'light' : null);
+                    themeToggle.text(newTheme === 'light' ? '☀️' : '🌙');
+                    localStorage.setItem('theme', newTheme);
+                    
+                    setTimeout(() => {
+                        body.removeClass('theme-transitioning');
+                    }, 400);
+                }, 50);
+            });
+
+            // Movie Loading Functionality
+            const movieForm = $('#movie-form');
+            const imdbInput = $('#imdb-input');
+            const watchBtn = $('#watch-btn');
+            const btnText = $('.btn-text');
+            const btnLoading = $('.btn-loading');
+            const playerContent = $('#player-content');
+            const playerPlaceholder = $('#player-placeholder');
+            const playerTitle = $('#player-title');
+            const playerSubtitle = $('#player-subtitle');
+            const serverControls = $('#server-controls');
+
+            // Embed sources
+            const embedSources = [
+                'https://vidsrc.to/embed/movie/',
+                'https://www.2embed.to/embed/imdb/movie?id=',
+                'https://autoembed.co/movie/imdb/'
+            ];
+
+            // Form submission
+            movieForm.on('submit', function(e) {
+                e.preventDefault();
+                loadMovie();
+            });
+
+            // Hint tags functionality
+            $('.hint-tag').on('click', function() {
+                const movieId = $(this).data('id');
+                imdbInput.val(movieId);
+                loadMovie();
+            });
+
+            // Server switching
+            $(document).on('click', '.server-btn', function() {
+                const serverIndex = parseInt($(this).data('server'));
+                switchServer(serverIndex);
+            });
+
+            // Player controls
+            $('#fullscreen-btn').on('click', function() {
+                const iframe = $('.player-iframe')[0];
+                if (iframe) {
+                    if (iframe.requestFullscreen) {
+                        iframe.requestFullscreen();
+                    } else if (iframe.webkitRequestFullscreen) {
+                        iframe.webkitRequestFullscreen();
+                    } else if (iframe.msRequestFullscreen) {
+                        iframe.msRequestFullscreen();
+                    }
+                }
+            });
+
+            $('#refresh-btn').on('click', function() {
+                if (currentImdbId) {
+                    switchServer(currentServer);
+                }
+            });
+
+            // Fetch movie details from OMDb API
+            async function fetchMovieDetails(imdbId) {
+                try {
+                    // Using a free OMDb API (you might need to get your own API key)
+                    const response = await fetch(`https://www.omdbapi.com/?i=tt${imdbId}&apikey=trilogy`);
+                    const data = await response.json();
+                    
+                    if (data.Response === 'True') {
+                        return {
+                            title: data.Title,
+                            year: data.Year,
+                            genre: data.Genre,
+                            director: data.Director,
+                            plot: data.Plot
+                        };
+                    }
+                } catch (error) {
+                    console.log('Could not fetch movie details:', error);
+                }
+                return null;
+            }
+
+            function loadMovie() {
+                let imdbId = imdbInput.val().trim();
+                
+                if (!imdbId) {
+                    showError('Please enter a valid IMDb Movie ID');
+                    return;
+                }
+
+                // Show loading state
+                setLoadingState(true);
+
+                // Clean and validate IMDb ID
+                imdbId = imdbId.replace(/^tt/, '');
+                
+                if (!/^\d{7,8}$/.test(imdbId)) {
+                    showError('Invalid IMDb ID format. Please use format: tt1375666');
+                    setLoadingState(false);
+                    return;
+                }
+
+                currentImdbId = imdbId;
+                currentServer = 0;
+
+                // Fetch movie details
+                fetchMovieDetails(imdbId).then(movieDetails => {
+                    if (movieDetails) {
+                        playerTitle.text(movieDetails.title);
+                        playerSubtitle.text(`${movieDetails.year} • ${movieDetails.genre}`);
+                    } else {
+                        playerTitle.text(`Movie tt${imdbId}`);
+                        playerSubtitle.text('Loading movie details...');
+                    }
+                });
+
+                // Show server controls
+                serverControls.show();
+                $('.server-btn').removeClass('active');
+                $('.server-btn[data-server="0"]').addClass('active');
+
+                // Load first server
+                switchServer(0);
+            }
+
+            function switchServer(serverIndex) {
+                if (!currentImdbId) return;
+
+                currentServer = serverIndex;
+                
+                // Update server button states
+                $('.server-btn').removeClass('active');
+                $(`.server-btn[data-server="${serverIndex}"]`).addClass('active');
+
+                // Remove existing iframe
+                $('.player-iframe').remove();
+
+                // Create new iframe with selected server
+                let iframeSrc;
+                if (serverIndex === 1) {
+                    iframeSrc = embedSources[serverIndex] + currentImdbId;
+                } else {
+                    iframeSrc = embedSources[serverIndex] + 'tt' + currentImdbId;
+                }
+
+                const iframe = $(`
+                    <iframe 
+                        class="player-iframe" 
+                        src="${iframeSrc}" 
+                        allowfullscreen
+                        webkitallowfullscreen
+                        mozallowfullscreen
+                        title="Movie Player"
+                        frameborder="0"
+                        scrolling="no"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    ></iframe>
+                `);
+
+                // Handle iframe load
+                let loadTimeout = setTimeout(() => {
+                    setLoadingState(false);
+                }, 5000);
+
+                iframe.on('load', function() {
+                    clearTimeout(loadTimeout);
+                    setLoadingState(false);
+                });
+
+                iframe.on('error', function() {
+                    clearTimeout(loadTimeout);
+                    showError(`Server ${serverIndex + 1} failed to load. Try another server.`);
+                    setLoadingState(false);
+                });
+
+                // Replace placeholder or existing iframe
+                if ($('.player-iframe').length === 0) {
+                    playerPlaceholder.fadeOut(300, function() {
+                        playerContent.append(iframe);
+                        iframe.fadeIn(300);
+                    });
+                } else {
+                    playerContent.append(iframe);
+                    iframe.fadeIn(300);
+                }
+            }
+
+            function setLoadingState(loading) {
+                if (loading) {
+                    btnText.hide();
+                    btnLoading.show();
+                    watchBtn.prop('disabled', true);
+                } else {
+                    btnText.show();
+                    btnLoading.hide();
+                    watchBtn.prop('disabled', false);
+                }
+            }
+
+            function showError(message) {
+                // Create and show error notification
+                const errorDiv = $(`
+                    <div style="
+                        position: fixed;
+                        top: 90px;
+                        right: 20px;
+                        background: linear-gradient(135deg, #ff4757 0%, #c44569 100%);
+                        color: white;
+                        padding: 1rem 1.5rem;
+                        border-radius: 12px;
+                        box-shadow: 0 8px 32px rgba(255, 71, 87, 0.4);
+                        z-index: 1001;
+                        max-width: 320px;
+                        font-size: 0.9rem;
+                        backdrop-filter: blur(10px);
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        animation: slideInRight 0.3s ease-out;
+                    ">
+                        ${message}
+                    </div>
+                `);
+
+                // Add slide animation
+                $('<style>').text(`
+                    @keyframes slideInRight {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                `).appendTo('head');
+
+                $('body').append(errorDiv);
+                
+                setTimeout(() => {
+                    errorDiv.fadeOut(300, function() {
+                        errorDiv.remove();
+                    });
+                }, 4000);
+            }
+
+            // Keyboard shortcuts
+            $(document).on('keydown', function(e) {
+                // Escape to clear player
+                if (e.key === 'Escape') {
+                    const iframe = $('.player-iframe');
+                    if (iframe.length) {
+                        iframe.fadeOut(300, function() {
+                            iframe.remove();
+                            playerPlaceholder.fadeIn(300);
+                            playerTitle.text('Movie Player');
+                            playerSubtitle.text('Ready to stream');
+                            serverControls.hide();
+                            currentImdbId = '';
+                        });
+                    }
+                }
+
+                // Number keys to switch servers
+                if (e.key >= '1' && e.key <= '3' && currentImdbId) {
+                    const serverIndex = parseInt(e.key) - 1;
+                    switchServer(serverIndex);
+                }
+            });
+
+            // Smooth scrolling for better UX
+            $('a[href^="#"]').on('click', function(e) {
+                e.preventDefault();
+                const target = $($(this).attr('href'));
+                if (target.length) {
+                    $('html, body').animate({
+                        scrollTop: target.offset().top - 70
+                    }, 500);
+                }
+            });
+
+            // Performance optimization: Preload popular movies
+            const popularMovies = ['tt1375666', 'tt0111161', 'tt0468569', 'tt0137523', 'tt0109830'];
+            popularMovies.forEach(id => {
+                fetchMovieDetails(id.replace('tt', ''));
+            });
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'978f2720d34fe82b',t:'MTc1NjgzODYwNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
